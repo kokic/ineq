@@ -1,2 +1,2 @@
 # ineq
-ineq proof in lean
+ineq (and others) proofs in lean.
