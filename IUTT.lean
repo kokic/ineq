@@ -10,10 +10,12 @@ lemma sub_fundamental_ineq (a b : ℝ) : a^2 + b^2 - 2*a*b ≥ 0 :=
     _ ≥ _ := sub_sq_nonneg a b
 
 
+
+
 lemma add_ge_add {a b c d : ℝ} (h₁ : a ≥ b) (h₂ : c ≥ d) : a + c ≥ b + d :=
-  sorry
-  -- have h₁' : b ≤ a := 
-  -- have h₂' : d ≤ c := 
+  have h₁' : b ≤ a := Iff.mpr ge_iff_le h₁
+  have h₂' : d ≤ c := Iff.mpr ge_iff_le h₂
+  show _ from add_le_add  h₁' h₂'
   -- have rev : b + d ≤ a + c := add_le_add
   -- show _ from rev
 
