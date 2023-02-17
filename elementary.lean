@@ -48,19 +48,36 @@ lemma bi_sqrt_nonneg (a b : ℝ) (ha : a ≥ 0) (hb : b ≥ 0) : (a*b)^(1/2) ≥
 lemma sqrt_sq (a : ℝ) (pa : a ≥ 0) : a = (a^(1/2))^2 := sorry
 lemma le_sqrt_sq (a : ℝ) (pa : a ≥ 0) : a ≤ (a^(1/2))^2 := sorry
 
+lemma sqrt_mul (a b : ℝ) : a^(1/2) * b^(1/2) = (a*b)^(1/2) := sorry
 
-theorem bi_arith_geom_ineq (a b : ℝ) 
-    (pa : a ≥ 0) (pb : b ≥ 0) : a + b ≥ 2*a^(1/2)*b^(1/2) :=
+lemma mul_same (x : ℝ) (heq : a = b) : x * a = x * b := sorry
+
+theorem fundamental_ineq' (a b : ℝ) 
+    (pa : a ≥ 0) (pb : b ≥ 0) : a + b ≥ 2 * (a*b)^(1/2) :=
   have ha : _ := sqrt_sq a pa
   have hb : _ := sqrt_sq b pb
   have hal : _ := le_sqrt_sq a pa
   have hbl : _ := le_sqrt_sq b pb
   have hs : _ := And.intro ha hb
   have heq : _ := Iff.mpr (add_eq_add_iff_eq_and_eq hal hbl) hs
+  have hmul : _ := sqrt_mul a b
   calc 
     a + b = (a^(1/2))^2 + (b^(1/2))^2 := heq
-        _ ≥ 2*a^(1/2)*b^(1/2) := fundamental_ineq _ _
+        _ ≥ 2 * a^(1/2) * b^(1/2) := fundamental_ineq _ _
+        _ = _ := mul_assoc _ _ _ -- by ring
+        _ = _ := mul_same 2 hmul
 
+lemma div_same_ge (a b : ℝ) (h : x > 0) (h' : a ≥ b) : a / x ≥ b / x := sorry
+
+theorem bi_arith_geom_ineq (a b : ℝ)
+    (pa : a ≥ 0) (pb : b ≥ 0) : (a + b) / 2 ≥ (a*b)^(1/2) :=
+  have hp : 2 > 0 := sorry
+  have h' : _ := fundamental_ineq' a b pa pb
+  calc 
+    _ ≥ 2 * (a * b) ^ (1 / 2) / 2 := div_same_ge _ _ hp h'
+    -- _ = (a * b) ^ (1 / 2) * 2 / 2 := by ring
+    _ = _ := by ring
+  -- have hr :  (a + b) / 2 ≥ 2 * (a * b) ^ (1 / 2) / 2 := div_same_ge _ _ hp h'
 
 
 #eval println! "hello ℓ₁"
