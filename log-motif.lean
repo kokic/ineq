@@ -44,9 +44,14 @@ theorem log_bi_arith_geom_ineq (a b : ℝ) (ha : a > 0) (hb : b > 0) :
 --     _ = (1/2) * log (2 * a/(a+b)) + (1/2) * log (2*b/(a+b)) := sorry
 --     _ ≤ 0 := sorry
 
+
+
 theorem bi_arith_geom_ineq (a b : ℝ)
   (ha : a > 0) (hb : b > 0) : (a + b) / 2 ≥ (a*b)^(1/2) := 
-  have hbot : (a + b) / 2 > 0 := sorry
+  have hsum : a + b > 0 := sorry
+  have h2 : 2 > 0 := sorry
+  have hbot : (a + b) / 2 > 0 := Iff.mp gt_iff_lt (div_pos hsum h2)
   have hlog : _ := log_bi_arith_geom_ineq a b ha hb
   show _ from Iff.mp (log_ineq_iff _ _ hbot) hlog
+
 
