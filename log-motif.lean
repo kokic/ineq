@@ -24,11 +24,42 @@ lemma sqrt_self (a : ℝ) : a = a^(1/2) * a^(1/2) := sorry
 lemma sqrt_decompose (a b : ℝ) : (a*b)^(1/2) = a^(1/2) * b^(1/2) := sorry
 
 lemma log_sqrt (a : ℝ) : log (a^(1/2)) = (1/2) * log a := sorry
+lemma add_map (a b : ℝ) (f : ℝ -> ℝ) : a + b = f a + f b := sorry
+
+
+lemma log_add_sqrt (a b : ℝ): log (a^(1/2)) + log (b^(1/2)) = (1/2) * log a + (1/2) * log b 
+  := sorry
 
 
 
 theorem log_bi_arith_geom_ineq (a b : ℝ) (ha : a > 0) (hb : b > 0) : 
-  log ( (a*b)^(1/2) / ((a+b)/2) ) ≤ 0 := sorry
+  log ( (a*b)^(1/2) / ((a+b)/2) ) ≤ 0 := 
+  have hale : _ := log_linear (2 * a/(a+b))
+  have hble : _ := log_linear (2 * b/(a+b))
+  have hline : log (2 * a/(a+b)) + log (2 * b/(a+b)) ≤ (2 * a/(a+b) - 1) + (2 * b/(a+b) - 1) 
+    := add_le_add hale hble
+  have hsum : a + b ≠ 0 := sorry
+  have hp : _ := sorry
+  have hp' : _ := sorry
+  calc 
+      _ = _ := sorry
+      _ = log ((2 * a/(a+b))^(1/2)) + log ((2*b/(a+b))^(1/2)) := log_mul_eq_add
+      _ = (1/2) * log (2 * a/(a+b)) + (1/2) * log (2*b/(a+b)) := log_add_sqrt _ _
+      _ = (1/2) * ( log (2 * a/(a+b)) + log (2 * b/(a+b)) ) := by ring
+      _ ≤ (1/2) * (2 * a/(a+b) - 1 + (2 * b/(a+b) - 1)) := mul_le_mul le_rfl hline hp hp'
+      _ = (a + b) / (a + b) - 1 := by ring
+      _ = 1 - 1 := by rw [div_self hsum]
+      _ = 0 := by simp
+
+theorem bi_arith_geom_ineq (a b : ℝ)
+  (ha : a > 0) (hb : b > 0) : (a + b) / 2 ≥ (a*b)^(1/2) := 
+  have hsum : a + b > 0 := add_pos ha hb
+  have h2 : 2 > 0 := by simp
+  have hbot : (a + b) / 2 > 0 := Iff.mp gt_iff_lt (div_pos hsum h2)
+  have hlog : _ := log_bi_arith_geom_ineq a b ha hb
+  show _ from Iff.mp (log_ineq_iff _ _ hbot) hlog
+
+
 
   -- calc 
     
@@ -43,15 +74,4 @@ theorem log_bi_arith_geom_ineq (a b : ℝ) (ha : a > 0) (hb : b > 0) :
 --     _ = log ((2 * a/(a+b))^(1/2)) + log ((2*a/(a+b))^(1/2)) := log_mul_eq_add
 --     _ = (1/2) * log (2 * a/(a+b)) + (1/2) * log (2*b/(a+b)) := sorry
 --     _ ≤ 0 := sorry
-
-
-
-theorem bi_arith_geom_ineq (a b : ℝ)
-  (ha : a > 0) (hb : b > 0) : (a + b) / 2 ≥ (a*b)^(1/2) := 
-  have hsum : a + b > 0 := add_pos ha hb
-  have h2 : 2 > 0 := by simp
-  have hbot : (a + b) / 2 > 0 := Iff.mp gt_iff_lt (div_pos hsum h2)
-  have hlog : _ := log_bi_arith_geom_ineq a b ha hb
-  show _ from Iff.mp (log_ineq_iff _ _ hbot) hlog
-
 
