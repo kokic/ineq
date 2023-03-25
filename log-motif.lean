@@ -1,7 +1,12 @@
 
 import Mathlib.Data.Real.Basic
 
+
 def log (x : ℝ) := x - 1
+
+
+
+-- #check 
 
 theorem log_mul_eq_add : log (a * b) = log a + log b := sorry
 theorem log_add_eq_mul : log a + log b = log (a * b) := Iff.mp eq_comm log_mul_eq_add
