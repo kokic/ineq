@@ -3,4 +3,4 @@
 /lean_packages/*
 !/lean_packages/manifest.json
 
-*-draft.lean
+*-draft*
