@@ -28,23 +28,46 @@ def char (x : Char) := satisfy (· == x)
 
 
 
-def to_string (p : Parser Char) := 
-  Parser.mk λ s => match p.parse s with
-    | some ⟨a, r⟩ => some (a.toString, r)
-    | _ => none
+def to_string (p : Parser Char) := p >>= (pure ·.toString)
+  -- Parser.mk λ s => match p.parse s with
+  --   | some ⟨a, r⟩ => some (a.toString, r)
+  --   | _ => none
 
-def follow {α β : Type} (p1 : Parser α) (p2 : Parser β) : Parser (α × β) :=
+-- def follow {α β : Type} (p1 : Parser α) (p2 : Parser β) : Parser (α × β) :=
+def follow (p1 : Parser α) (p2 : Parser β) :=
   p1 >>= λ a => p2 >>= λ b => pure (a, b)
 
 #eval (follow (char 'x') (char 'd')).parse "xdd"
 
 
+def either (p1 p2 : Parser α) : Parser α :=
+  Parser.mk λ s =>
+    match p1.parse s with
+    | some x => some x
+    | none => p2.parse s
+
+
+
+-- def many_aux (p : Parser α) (data: List α) (residue : String) : Parser (List α) := 
+--   Parser.mk λ s => 
+--     have h1 : List α × String := (data, residue)
+--     have h2 : List α × String → Option (List α × String) := λ x => some x
+--     match p.parse s with
+--       | some ⟨a, r⟩ => 
+--         have h3 : List α × String := (data ++ [a], r)
+--         have h4 : List α × String → Option (List α × String) := λ x => many_aux p x.1 x.2 |>.parse r
+--         h4 h3
+--       | _ => h2 h1
+
 
 -- def many_aux (p : Parser α) (data: List α) (residue : String) : Parser (List α) := 
 --   Parser.mk λ s => match p.parse s with
---     | [(a, r)] => many_aux p (data ++ [a]) r |>.parse s
---     | _ => [(data, residue)]
--- termination_by _ data residue => [(data, residue)]
+--     | some ⟨a, r⟩ => many_aux p (data ++ [a]) r |>.parse r
+--     | _ => (data, residue)
+
+    
+-- termination_by (measureOfList α) data residue => (data, residue)
+-- termination_by _ data residue => (data, residue)
 -- decreasing_by simp
 
 

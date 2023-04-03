@@ -3,4 +3,5 @@
 /lean_packages/*
 !/lean_packages/manifest.json
 
+*clipboard-*
 *-draft*
