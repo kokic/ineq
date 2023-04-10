@@ -58,8 +58,7 @@ partial def shuffle (data: ShuffleData) (currentPosition: Nat) (limit: Nat) : Sh
 def consistentShuffle (alphabet: String) : (String -> String)
   | "" => alphabet
   | salt => let initial := ShuffleData.mk alphabet.toList salt 0 0
-            "" -- shuffle (initial, alphabet.length - 1, 1).alphabet.joinToString(emptyString)
-
+            (shuffle initial (alphabet.length - 1) 1).alphabet.asString
 
 
 
