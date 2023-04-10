@@ -1,4 +1,6 @@
 
+
+
 structure HashIds :=
   (salt : String)
   (alphabet : String)
@@ -9,6 +11,13 @@ structure HashIds :=
 #check HashIds -- just checking if the structure is defined correctly
 
 
+
+
+structure AlphabetAndSeparators := 
+  (alphabet: String) 
+  (separators: String)
+  (guards: String := "")
+
 structure ShuffleData := 
   (alphabet: List Char)
   (salt: String)
@@ -18,6 +27,8 @@ structure ShuffleData :=
 structure HashData := 
   (hash: String) 
   (current: UInt64)
+
+
 
 
 
@@ -33,12 +44,26 @@ def defaultMinimalHashLength := 0
 def defaultHashIds : HashIds := HashIds.mk defaultSalt defaultAlphabet defaultSeparators
 
 
+def THIS_IS_MY_SALT := "this is my salt"
+
+
+
+
+
+def calculateAlphabetAndSeparators (userAlphabet : String) : AlphabetAndSeparators 
+  := sorry
+
+
 def salt := defaultSalt
 def alphabet := defaultAlphabet
 def separators := defaultSeparators
 def hashLength := defaultMinimalHashLength
 
 def guards := "xxxxx" -- WARNING!
+
+
+
+
 
 
 partial def shuffle (data: ShuffleData) (currentPosition: Nat) (limit: Nat) : ShuffleData :=
@@ -59,6 +84,8 @@ def consistentShuffle (alphabet: String) : (String -> String)
   | "" => alphabet
   | salt => let initial := ShuffleData.mk alphabet.toList salt 0 0
             (shuffle initial (alphabet.length - 1) 1).alphabet.asString
+
+
 
 
 
@@ -148,5 +175,30 @@ def encode : List UInt64 -> Except String String
           Except.ok (ensureMinimalLength (len / 2) encodingAlphabet returnString)
 
 
--- #eval encode []
+
+
+
+
+
+
+
+
+
+def extractLotteryCharAndHashArray (initialSplit: List String) : Char × List String
+  := sorry
+
+
+
+def decode (hash : String) : List UInt64 :=
+  if hash.isEmpty then []
+  else let guardsRegex := s!"[{guards}]"
+       let hashWithSpacesInsteadOfGuards := hash.replace guardsRegex " "
+       let initialSplit := hashWithSpacesInsteadOfGuards.splitOn " "
+      --  let (lottery, hashBreakdown) := extractLotteryCharAndHashArray initialSplit   
+       []
+
+
+
+
+#eval encode []
 
