@@ -37,12 +37,26 @@ def initialEncode (numbers: List UInt64)
   
 
 
+structure ShuffleData := 
+  (alphabet: List Char)
+  (salt: String)
+  (cumulative: Int) 
+  (saltReminder: Int)
+
+
+def consistentShuffle (alphabet: String) : (String -> String)
+  | "" => alphabet
+  | salt => let initial := ShuffleData.mk alphabet.toList salt 0 0
+            "" -- shuffle (initial, alphabet.length - 1, 1).alphabet.joinToString(emptyString)
+
 def ensureMinimalLength (halfLength: Int) 
                         (alphabet: String) 
-                        (returnString: String): String 
-  := sorry
-
-
+                        (returnString: String): String := 
+  if returnString.length >= hashLength then returnString
+  else let alphabet' := consistentShuffle alphabet alphabet
+       let returnString' := returnString -- alphabet'.substring halfLength ++ returnString ++ alphabet'.substring 0 halfLength
+       ensureMinimalLength halfLength alphabet' returnString'
+decreasing_by sorry
 
 
 def guardIndex (numbersHash: UInt32) (returnString: String) (index: Nat): Nat := 
