@@ -8,6 +8,19 @@ structure HashIds :=
 
 #check HashIds -- just checking if the structure is defined correctly
 
+
+structure ShuffleData := 
+  (alphabet: List Char)
+  (salt: String)
+  (cumulative: Nat) 
+  (saltReminder: Nat)
+
+structure HashData := 
+  (hash: String) 
+  (current: UInt64)
+
+
+
 -- javascript Number.MAX_SAFE_INTEGER + 1
 def MAX_INTEGER : UInt64 := 9007199254740992
 
@@ -27,11 +40,19 @@ def hashLength := defaultMinimalHashLength
 
 def guards := "xxxxx" -- WARNING!
 
-structure ShuffleData := 
-  (alphabet: List Char)
-  (salt: String)
-  (cumulative: Int) 
-  (saltReminder: Int)
+
+partial def shuffle (data: ShuffleData) (currentPosition: Nat) (limit: Nat) : ShuffleData :=
+  if currentPosition < limit then data
+  else let currentAlphabet := data.alphabet
+       let saltReminder := data.saltReminder % data.salt.length
+       let asciiValue := (data.salt.get! (String.Pos.mk saltReminder)).toNat
+       let cumulativeValue := data.cumulative + asciiValue
+       let positionToSwap := (asciiValue + saltReminder + cumulativeValue) % currentPosition
+       let currentAlphabet' := currentAlphabet.set positionToSwap (currentAlphabet[currentPosition]!)
+       let currentAlphabet'' := currentAlphabet'.set currentPosition (currentAlphabet[positionToSwap]!)
+       shuffle (ShuffleData.mk currentAlphabet'' data.salt cumulativeValue (saltReminder + 1)) 
+               (currentPosition - 1) limit
+
 
 
 def consistentShuffle (alphabet: String) : (String -> String)
@@ -40,9 +61,23 @@ def consistentShuffle (alphabet: String) : (String -> String)
             "" -- shuffle (initial, alphabet.length - 1, 1).alphabet.joinToString(emptyString)
 
 
-def hash (input: UInt64) (alphabet: String): String := sorry
 
-def initialEncode (numbers: List UInt64)
+
+partial def hashAux (number: UInt64) (alphabet: List Char) (data: HashData): HashData := 
+  if data.current <= 0 then data 
+  else let hashCharacter := alphabet[(data.current % alphabet.length).toNat]!
+       let current := data.current / alphabet.length.toUInt64
+       hashAux number alphabet (HashData.mk s!"{hashCharacter}{data.hash}" current)
+
+def hash (input: UInt64) (alphabet: String): String := 
+  (hashAux input (alphabet.toList) (HashData.mk "" input)).hash
+
+
+
+
+
+
+partial def initialEncode (numbers: List UInt64)
                   (separators: List Char)
                   (bufferSeed: String)
                   (currentIndex: Nat)
@@ -53,11 +88,18 @@ def initialEncode (numbers: List UInt64)
        let buffer := bufferSeed ++ salt ++ alphabet
        let alphabet' := consistentShuffle alphabet (buffer.extract 0 (String.Pos.mk alphabet.length))
        let last := hash currentNumber alphabet'
-       ("", "") 
+       let returnString := if currentIndex + 1 >= numbers.length 
+         then currentReturnString ++ last
+         else let nextNumber := currentNumber.toNat % ((last.get! 0).toNat + currentIndex)
+              let sepsIndex := nextNumber % separators.length
+              currentReturnString ++ last ++ separators[sepsIndex]!.toString
+       initialEncode numbers separators bufferSeed (currentIndex + 1) alphabet' returnString
+-- decreasing_by sorry
 
 
 
-def ensureMinimalLength (halfLength: Nat) 
+
+partial def ensureMinimalLength (halfLength: Nat) 
                         (alphabet: String) 
                         (returnString: String): String := 
   if returnString.length >= hashLength then returnString
@@ -66,7 +108,10 @@ def ensureMinimalLength (halfLength: Nat)
                          ++ returnString 
                          ++ alphabet'.extract 0 (String.Pos.mk halfLength)
        ensureMinimalLength halfLength alphabet' returnString'
-decreasing_by sorry
+-- decreasing_by sorry
+
+
+
 
 
 def guardIndex (numbersHash: UInt32) (returnString: String) (index: Nat): Nat := 
@@ -81,6 +126,9 @@ def addGuardsIfNecessary (encodedString: String)
        if returnString.length >= hashLength then returnString
        else let guard' := guards.toList[guardIndex numbersHash returnString 2]!
             returnString ++ guard'.toString
+
+
+
 
 
 
