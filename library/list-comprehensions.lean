@@ -5,8 +5,8 @@ syntax "for" term "<-" term : compClause
 syntax "for" term "←" term : compClause
 syntax "if " term : compClause
 syntax "[" term " | " compClause,* "]" : term
-syntax "[" term ".." term "]" : term
-syntax "[" term "," term ".." term "]" : term
+-- syntax "[" term ".." term "]" : term
+-- syntax "[" term "," term ".." term "]" : term
 
 
 def List.map' (xs : List α) (f : α → β) : List β := List.map f xs
@@ -61,9 +61,9 @@ def List.prod (xs : List α) (ys : List β) : List (α × β) := [(x, y) | for x
 -- #eval [(-5) .. 5]
 -- #eval [7 .. (-2)]
 
--- #eval [1 .. 2].prod [ 3 ]
+#eval [1 .. 2].prod [ 3 ]
 
--- #eval [x % 5 | for x ← [(-1) .. 6]]
--- #eval [[0 .. x] | for x in [4 .. (-1)]]
+#eval [x % 5 | for x ← [(-1) .. 6]]
+#eval [[0 .. x] | for x in [4 .. (-1)]]
 
--- #eval [1, (-3) .. (-20)]
+#eval [1, (-3) .. (-20)]
