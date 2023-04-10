@@ -27,16 +27,6 @@ def hashLength := defaultMinimalHashLength
 
 def guards := "xxxxx" -- WARNING!
 
-def initialEncode (numbers: List UInt64)
-                  (separators: List Char)
-                  (bufferSeed: String)
-                  (currentIndex: Int)
-                  (alphabet: String)
-                  (currentReturnString: String) : String × String 
-  := sorry
-  
-
-
 structure ShuffleData := 
   (alphabet: List Char)
   (salt: String)
@@ -49,12 +39,32 @@ def consistentShuffle (alphabet: String) : (String -> String)
   | salt => let initial := ShuffleData.mk alphabet.toList salt 0 0
             "" -- shuffle (initial, alphabet.length - 1, 1).alphabet.joinToString(emptyString)
 
-def ensureMinimalLength (halfLength: Int) 
+
+def hash (input: UInt64) (alphabet: String): String := sorry
+
+def initialEncode (numbers: List UInt64)
+                  (separators: List Char)
+                  (bufferSeed: String)
+                  (currentIndex: Nat)
+                  (alphabet: String)
+                  (currentReturnString: String) : String × String := 
+  if currentIndex >= numbers.length then (currentReturnString, alphabet)
+  else let currentNumber := numbers[currentIndex]!
+       let buffer := bufferSeed ++ salt ++ alphabet
+       let alphabet' := consistentShuffle alphabet (buffer.extract 0 (String.Pos.mk alphabet.length))
+       let last := hash currentNumber alphabet'
+       ("", "") 
+
+
+
+def ensureMinimalLength (halfLength: Nat) 
                         (alphabet: String) 
                         (returnString: String): String := 
   if returnString.length >= hashLength then returnString
   else let alphabet' := consistentShuffle alphabet alphabet
-       let returnString' := returnString -- alphabet'.substring halfLength ++ returnString ++ alphabet'.substring 0 halfLength
+       let returnString' := alphabet'.drop halfLength 
+                         ++ returnString 
+                         ++ alphabet'.extract 0 (String.Pos.mk halfLength)
        ensureMinimalLength halfLength alphabet' returnString'
 decreasing_by sorry
 
