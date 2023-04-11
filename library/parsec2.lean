@@ -34,15 +34,18 @@ def to_string (p : Parser Char) := p >>= (pure ·.toString)
   --   | _ => none
 
 -- def follow {α β : Type} (p1 : Parser α) (p2 : Parser β) : Parser (α × β) :=
-def follow (p1 : Parser α) (p2 : Parser β) :=
-  p1 >>= λ a => p2 >>= λ b => pure (a, b)
+def follow (p : Parser α) (p' : Parser β) := p >>= λ a => p' >>= λ b => pure (a, b)
 
-#eval (follow (char 'x') (char 'd')).parse "xdd"
+-- #eval (follow (char 'x') (char 'd')).parse "xdd"
+
+
+def move (p : Parser α) (p' : Parser β) := follow p p' >>= (pure ·.1)
+
+def map2 (p : Parser (α × β)) (f : α × β → γ) := p >>= (· |> f |> pure)
 
 
 def either (p1 p2 : Parser α) : Parser α :=
-  Parser.mk λ s =>
-    match p1.parse s with
+  Parser.mk λ s => match p1.parse s with
     | some x => some x
     | none => p2.parse s
 
@@ -54,28 +57,38 @@ def either (p1 p2 : Parser α) : Parser α :=
 --     have h2 : List α × String → Option (List α × String) := λ x => some x
 --     match p.parse s with
 --       | some ⟨a, r⟩ => 
---         have h3 : List α × String := (data ++ [a], r)
+--         have h3 : List α × String := (data ++ [ a ], r)
 --         have h4 : List α × String → Option (List α × String) := λ x => many_aux p x.1 x.2 |>.parse r
 --         h4 h3
 --       | _ => h2 h1
-
-
--- def many_aux (p : Parser α) (data: List α) (residue : String) : Parser (List α) := 
---   Parser.mk λ s => match p.parse s with
---     | some ⟨a, r⟩ => many_aux p (data ++ [a]) r |>.parse r
---     | _ => (data, residue)
-
-    
 -- termination_by (measureOfList α) data residue => (data, residue)
 -- termination_by _ data residue => (data, residue)
 -- decreasing_by simp
 
+
+partial def many_aux (p : Parser α) (data: List α) (residue : String) : List α × String := 
+  match p.parse residue with
+    | some ⟨a, r⟩ => many_aux p (data ++ [a]) r
+    | _ => (data, residue)
+
+def many (p : Parser α) : Parser (List α) := Parser.mk (λ s => many_aux p [] s)
+
+
+
+def asterisk (p : Parser String) : Parser String := many p >>= (· |> appends |> pure)
+  where appends : (List String -> String) := (·.foldl String.append "")
+
+
+-- #eval char 'a' |> to_string |> asterisk |>.parse "aabb"
 
 -- def asterisk_aux (p : Parser String) (data: String) (residue : String) : Parser String := 
 --   Parser.mk λ s => match p.parse s with
 --     | [(a, r)] => asterisk_aux (to_string (char 'a')) (data ++ a) r |>.parse s
 --     | _ => [(data, residue)]
 
--- def many (p1 : Parser α) : Parser List α := 
+
+
+
+
 
 

@@ -17,6 +17,7 @@ structure Parser (α : Type) :=
 --     `parse failed ↔ []       ↔ None ↔ Err`
 
 
+
 def satisfy (p : Char → Bool) : Parser Char :=
   Parser.mk fun s =>
     match s.toList with
@@ -44,7 +45,7 @@ def follow {α β : Type} (p1 : Parser α) (p2 : Parser β) : Parser (α × β) 
 
 -- def many_aux (p : Parser α) (data: List α) (residue : String) : Parser (List α) := 
 --   Parser.mk λ s => match p.parse s with
---     | [(a, r)] => many_aux p (data ++ [a]) r |>.parse s
+--     | [(a, r)] => many_aux p (data ++ [ a ]) r |>.parse s
 --     | _ => [(data, residue)]
 -- termination_by _ data residue => [(data, residue)]
 -- decreasing_by simp
