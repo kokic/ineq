@@ -198,15 +198,24 @@ def extractLotteryCharAndHashs (initialSplit : List String) : Char × List Strin
 
 -/
 
-def doUnhash (input: CharArray) 
-             (alphabet: String) 
-             (alphabetLengthDouble: UInt64) 
-             (currentNumber: UInt64) 
-             (currentIndex: Int): UInt64
-  := sorry
+
+
+partial def unhashAux (input: List Char) 
+              (alphabet: String) 
+              (alphabetLengthU64: UInt64) 
+              (currentNumber: UInt64) 
+              (currentIndex: Nat): UInt64 :=
+  if currentIndex >= input.length then currentNumber
+  else let position := alphabet.find (· == input[currentIndex]!) |>.byteIdx
+       let exp := input.length - currentIndex - 1
+       let factor := alphabetLengthU64.toNat ^ exp |>.toUInt64
+       let number := currentNumber + (position.toUInt64 * factor)
+       unhashAux input alphabet alphabetLengthU64 number (currentIndex + 1)
+
 
 def unhash (input: String) (alphabet: String): UInt64 :=
-  doUnhash input alphabet alphabet.length.toUInt64 0 0
+  unhashAux input.toList alphabet alphabet.length.toUInt64 0 0
+
 
 def unhashSubHashes (hashes: List String) 
                     (lottery: Char) 
@@ -226,9 +235,13 @@ def unhashSubHashes (hashes: List String)
       
   unhashSubHashesAux hashes currentReturn alphabet
 
-           
 
 
+
+
+
+
+-- require RegExp
 def decode (hash : String) : Except String (List UInt64) :=
   if hash.isEmpty then Except.ok []
   else let guardsRegex := s!"[{guards}]"
@@ -241,5 +254,6 @@ def decode (hash : String) : Except String (List UInt64) :=
          | _ => Except.error "decode error"
 
 
-#eval encode []
+
+
 
