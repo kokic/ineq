@@ -193,12 +193,40 @@ def extractLotteryCharAndHashs (initialSplit : List String) : Char × List Strin
 
 
 
+/-
+
+
+-/
+
+def doUnhash (input: CharArray) 
+             (alphabet: String) 
+             (alphabetLengthDouble: UInt64) 
+             (currentNumber: UInt64) 
+             (currentIndex: Int): UInt64
+  := sorry
+
+def unhash (input: String) (alphabet: String): UInt64 :=
+  doUnhash input alphabet alphabet.length.toUInt64 0 0
 
 def unhashSubHashes (hashes: List String) 
                     (lottery: Char) 
                     (currentReturn: List UInt64) 
-                    (alphabet: String): List UInt64 := sorry
+                    (alphabet: String): List UInt64 :=
 
+  let rec unhashSubHashesAux (hashes: List String) 
+                             (currentReturn: List UInt64) 
+                             (alphabet: String): List UInt64 :=
+    match hashes with
+      | [] => currentReturn
+      | h :: t =>
+        let buffer := s!"{lottery}{salt}{alphabet}"
+        let alphabet' := consistentShuffle alphabet (buffer.extract 0 (String.Pos.mk alphabet.length))
+        let decoded := unhash h alphabet'
+        unhashSubHashesAux t (currentReturn ++ [decoded]) alphabet'
+      
+  unhashSubHashesAux hashes currentReturn alphabet
+
+           
 
 
 def decode (hash : String) : Except String (List UInt64) :=
