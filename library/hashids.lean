@@ -179,25 +179,38 @@ def encode : List UInt64 -> Except String String
 
 
 
+-- require RegExp
+def extractLotteryCharAndHashs (initialSplit : List String) : Char × List String :=
+  let separatorsRegex : String := s!"[{separators}]"
+  let i : Nat := if initialSplit.length = 2 ∨ initialSplit.length = 3 then 1 else 0
+  let ithElementOfSplit : String := initialSplit.get! i
+  let lotteryChar : Char := ithElementOfSplit.get! 0
+  let breakdown : List String :=
+    let substr : String := ithElementOfSplit.extract (String.Pos.mk 1) 
+      (String.Pos.mk ithElementOfSplit.length)
+    substr.replace separatorsRegex " " |>.splitOn " "
+  (lotteryChar, breakdown)
 
 
 
 
+def unhashSubHashes (hashes: List String) 
+                    (lottery: Char) 
+                    (currentReturn: List UInt64) 
+                    (alphabet: String): List UInt64 := sorry
 
-def extractLotteryCharAndHashArray (initialSplit: List String) : Char × List String
-  := sorry
 
 
-
-def decode (hash : String) : List UInt64 :=
-  if hash.isEmpty then []
+def decode (hash : String) : Except String (List UInt64) :=
+  if hash.isEmpty then Except.ok []
   else let guardsRegex := s!"[{guards}]"
        let hashWithSpacesInsteadOfGuards := hash.replace guardsRegex " "
        let initialSplit := hashWithSpacesInsteadOfGuards.splitOn " "
-      --  let (lottery, hashBreakdown) := extractLotteryCharAndHashArray initialSplit   
-       []
-
-
+       let (lottery, hashBreakdown) := extractLotteryCharAndHashs initialSplit   
+       let returnValue := unhashSubHashes hashBreakdown lottery [] alphabet
+       match encode returnValue with
+         | Except.ok s => Except.ok (if s == hash then [] else returnValue)
+         | _ => Except.error "decode error"
 
 
 #eval encode []
