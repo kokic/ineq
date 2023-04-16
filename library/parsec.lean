@@ -58,6 +58,7 @@ def Parser.either (p1 p2 : Parser α) : Parser α :=
     | some x => some x
     | none => p2.parse s
 
+def Parser.or (p1 p2 : Parser α) := Parser.either p1 p2
 
 def Parser.eitherLazy (p1 : Parser α) (supply : Unit -> Parser α) : Parser α :=
   Parser.mk λ s => match p1.parse s with
@@ -91,7 +92,7 @@ partial def many_aux (p : Parser α) (data: List α) (residue : String) : List �
     | some ⟨a, r⟩ => many_aux p (data ++ [a]) r
     | _ => (data, residue)
 
-def Parser.many (p : Parser α) : Parser (List α) := Parser.mk (λ s => many_aux p [] s)
+def Parser.many (p : Parser α) : Parser (List α) := ⟨λ s => many_aux p [] s⟩
 
 def Parser.positive (p : Parser α) : Parser (List α) := p.many.filter (λ x => x.length >= 1)
 
