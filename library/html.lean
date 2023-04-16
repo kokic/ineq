@@ -1,15 +1,6 @@
 
 
--- WIP. 
-
 import library.parsec
-
-
-
--- def paragraph := 
-
-
-
 
 def elementBegin := char '<' |>.move alphanum |>.skip (char '>')
 def elementEnd := string "</" |>.move alphanum |>.skip (char '>')
@@ -22,6 +13,4 @@ partial def element _ :=
     |>.filter (λ x => x.fst.fst == x.snd)
     |>.map (λ x => x.fst.snd)
 
-#eval element () |>.parse "<p><a>text</a></p>"
-
-
+#eval element () |>.parse "<p><a>rcx</a></p>"

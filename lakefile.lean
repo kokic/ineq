@@ -9,7 +9,10 @@ package IUTT {
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
--- @[defaultTarget]
+
+-- @[ defaultTarget ]
 -- lean_lib «iutt» {
 --   -- add any library configuration options here
 -- }
+
+lean_lib library

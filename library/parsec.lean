@@ -26,29 +26,43 @@ def satisfy (p : Char → Bool) : Parser Char :=
 def char (x : Char) := satisfy (· == x)
 -- #eval char 'x' |>.parse "xd"
 
-
-
 def to_string (p : Parser Char) := p >>= (pure ·.toString)
+
+def satisfy_alt (p : Char -> Bool) := satisfy p |> to_string
+def char_alt (x : Char) := char x |> to_string
+
+
+def string (x : String) : Parser String := Parser.mk λ s => 
+  if s.startsWith x then (x, s.drop x.length) else none
+
+
   -- Parser.mk λ s => match p.parse s with
   --   | some ⟨a, r⟩ => some (a.toString, r)
   --   | _ => none
 
 -- def follow {α β : Type} (p1 : Parser α) (p2 : Parser β) : Parser (α × β) :=
-def follow (p : Parser α) (p' : Parser β) := p >>= λ a => p' >>= λ b => pure (a, b)
+def Parser.follow (p : Parser α) (p' : Parser β) := p >>= λ a => p' >>= λ b => pure (a, b)
 
 -- #eval (follow (char 'x') (char 'd')).parse "xdd"
 
 
-def move (p : Parser α) (p' : Parser β) := follow p p' >>= (pure ·.1)
+def Parser.skip (p : Parser α) (p' : Parser β) := p.follow p' >>= (pure ·.fst)
+def Parser.move (p : Parser α) (p' : Parser β) := p.follow p' >>= (pure ·.snd)
 
-def map2 (p : Parser (α × β)) (f : α × β → γ) := p >>= (· |> f |> pure)
+def Parser.map (p : Parser α) (f : α -> β) := p >>= (· |> f |> pure)
+def Parser.map2 (p : Parser (α × β)) (f : α × β → γ) := p >>= (· |> f |> pure)
 
 
-def either (p1 p2 : Parser α) : Parser α :=
+def Parser.either (p1 p2 : Parser α) : Parser α :=
   Parser.mk λ s => match p1.parse s with
     | some x => some x
     | none => p2.parse s
 
+
+def Parser.eitherLazy (p1 : Parser α) (supply : Unit -> Parser α) : Parser α :=
+  Parser.mk λ s => match p1.parse s with
+    | some x => some x
+    | none => (supply ()).parse s
 
 
 -- def many_aux (p : Parser α) (data: List α) (residue : String) : Parser (List α) := 
@@ -66,17 +80,32 @@ def either (p1 p2 : Parser α) : Parser α :=
 -- decreasing_by simp
 
 
+def Parser.filter (p : Parser α) (predicate : α -> Bool) := Parser.mk (
+  λ s => match p |>.parse s with
+    | some ⟨a, r⟩ => if predicate a then some (a, r) else none
+    | _ => none
+)
+
 partial def many_aux (p : Parser α) (data: List α) (residue : String) : List α × String := 
   match p.parse residue with
     | some ⟨a, r⟩ => many_aux p (data ++ [a]) r
     | _ => (data, residue)
 
-def many (p : Parser α) : Parser (List α) := Parser.mk (λ s => many_aux p [] s)
+def Parser.many (p : Parser α) : Parser (List α) := Parser.mk (λ s => many_aux p [] s)
 
+def Parser.positive (p : Parser α) : Parser (List α) := p.many.filter (λ x => x.length >= 1)
 
+-- Parser.mk (
+--   λ s => match many p |>.parse s with
+--     | some ⟨a, r⟩  => if a.length >= 1 then some (a, r) else none
+--     | _ => none
+-- )
 
-def asterisk (p : Parser String) : Parser String := many p >>= (· |> appends |> pure)
-  where appends : (List String -> String) := (·.foldl String.append "")
+def List.reduceStr : (List String -> String) := (·.foldl String.append "")
+
+def Parser.asterisk (p : Parser String) : Parser String := p.many.map (·.reduceStr)
+def Parser.plus (p : Parser String) : Parser String := p.positive.map (·.reduceStr)
+
 
 
 -- #eval char 'a' |> to_string |> asterisk |>.parse "aabb"
@@ -90,5 +119,20 @@ def asterisk (p : Parser String) : Parser String := many p >>= (· |> appends |>
 
 
 
+
+-- others
+
+def space := char_alt ' '
+def spacea := space.asterisk
+def spaces := space.plus
+
+def alphanum := satisfy_alt (·.isAlphanum) |>.plus
+
+
+
+
+
+
+-- def html := 
 
 
