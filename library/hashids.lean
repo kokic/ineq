@@ -216,7 +216,6 @@ partial def unhashAux (input: List Char)
 def unhash (input: String) (alphabet: String): UInt64 :=
   unhashAux input.toList alphabet alphabet.length.toUInt64 0 0
 
-
 def unhashSubHashes (hashes: List String) 
                     (lottery: Char) 
                     (currentReturn: List UInt64) 
@@ -229,7 +228,8 @@ def unhashSubHashes (hashes: List String)
       | [] => currentReturn
       | h :: t =>
         let buffer := s!"{lottery}{salt}{alphabet}"
-        let alphabet' := consistentShuffle alphabet (buffer.extract 0 (String.Pos.mk alphabet.length))
+        let alphabet' := consistentShuffle alphabet 
+          (buffer.extract 0 (String.Pos.mk alphabet.length))
         let decoded := unhash h alphabet'
         unhashSubHashesAux t (currentReturn ++ [decoded]) alphabet'
       
