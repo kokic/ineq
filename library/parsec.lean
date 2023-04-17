@@ -102,10 +102,10 @@ def Parser.positive (p : Parser α) : Parser (List α) := p.many.filter (λ x =>
 --     | _ => none
 -- )
 
-def List.reduceStr : (List String -> String) := (·.foldl String.append "")
+def List.reduceString : (List String -> String) := (·.foldl String.append "")
 
-def Parser.asterisk (p : Parser String) : Parser String := p.many.map (·.reduceStr)
-def Parser.plus (p : Parser String) : Parser String := p.positive.map (·.reduceStr)
+def Parser.asterisk (p : Parser String) : Parser String := p.many.map (·.reduceString)
+def Parser.plus (p : Parser String) : Parser String := p.positive.map (·.reduceString)
 
 
 
@@ -129,6 +129,8 @@ def spaces := space.plus
 
 def alphanum := satisfy_alt (·.isAlphanum) |>.plus
 
+
+def Parser.trim (p : Parser α) : Parser α := ⟨p.parse ∘ String.trim⟩ 
 
 
 
