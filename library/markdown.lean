@@ -49,7 +49,16 @@ partial def MdElement.append : (MdElement -> MdElement -> MdElement)
       else let e := a.getLastD empty |>.append (ulistline n b)
            ulist m (a.set (a.length - 1) e)
 
+/-
 
+  for some reasons, we must assume that the parameter of 
+  the ulistline constructor is also a List MdElement, 
+  and some modifications need to be made to the parameters of 
+  the ulist constructor. specifically, two Nats should 
+  be prepared to record the indentation of the list itself 
+  and the indentation of the current last part of the element.
+
+-/
 
       -- let e := a.getLastD empty |>.append (ulistline n b)
       -- ulist (a.set (a.length - 1) e)
