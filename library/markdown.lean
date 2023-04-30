@@ -15,8 +15,8 @@ inductive MdElement
   -- | italic : String → MdElement
   -- | link : String → String → MdElement
   -- | image : String → String → MdElement
-  | ulistline : Nat → List MdElement → MdElement
-  | ulist : Nat → List MdElement → MdElement
+  | ulistline : MdElement → MdElement
+  | ulist : List MdElement → MdElement
   
   | empty : MdElement
   | indent : MdElement → Nat → MdElement → MdElement
@@ -34,6 +34,10 @@ partial def MdElement.append : (MdElement -> MdElement -> MdElement)
   | paragraphline a, paragraphline b
   | paragraph a, paragraphline b => paragraph s!"{a} {b}"
 
+  -- | unlistline n a, unlistline m b => 
+    
+
+/-
   | ulistline n a, ulistline n' b => 
       if n == n' then ulist n [ulistline n a, ulistline n' b]
       else -- let ε := relint n n'
@@ -49,8 +53,6 @@ partial def MdElement.append : (MdElement -> MdElement -> MdElement)
       else let e := a.getLastD empty |>.append (ulistline n b)
            ulist m (a.set (a.length - 1) e)
 
-
-
       -- let e := a.getLastD empty |>.append (ulistline n b)
       -- ulist (a.set (a.length - 1) e)
 
@@ -65,6 +67,7 @@ partial def MdElement.append : (MdElement -> MdElement -> MdElement)
   | ulist n a, paragraphline s => 
       let e := a.getLastD empty |>.append (line s)
       ulist n (a.set (a.length - 1) e)
+-/
 
   -- | markdown x (ulist m l), ulistline n a => 
   --     if m == n then markdown x (ulist m (l ++ [ulistline n a]))
@@ -76,10 +79,17 @@ partial def MdElement.append : (MdElement -> MdElement -> MdElement)
 instance : Append MdElement := ⟨MdElement.append⟩ 
 
 
-def reduceline (xs : List String) := 
-  let f := λ x y => x ++ "\n" ++ y
-  let body := xs.tail!.foldl f xs.head!
-  s!"\n{body}\n"
+-- def reduceline (xs : List String) := 
+--   let f := λ x y => x ++ "\n" ++ y
+--   let body := xs.tail!.foldl f xs.head!
+--   s!"\n{body}\n"
+
+-- def listString (xs : List MdElement) (indent : Nat) : String := 
+--   xs.map (
+--     λ x => match x with 
+--     | ulist xs' => listString xs' (indent + 2)
+--     | e => ""
+--   ) |>.reduceString
 
 partial def MdElement.toString : (MdElement -> String) 
   | heading n s => htmlTag s!"h{n}" s
@@ -89,9 +99,10 @@ partial def MdElement.toString : (MdElement -> String)
   | paragraphline s
   | paragraph s => htmlTag "p" s
 
-  | ulistline n e => s!"[{n}]-" ++ (e.map (·.toString) |>.reduceString)
-  | ulist n xs => htmlTag "ul" (xs.map (·.toString |> li) |> reduceline)
-  
+  -- | ulistline n e => s!"[{n}]-" ++ (e.map (·.toString) |>.reduceString)
+  -- | ulist n xs => htmlTag "ul" (xs.map (·.toString |> li) |> reduceline)
+  -- | ulist xs => 
+
   | breakline => "<br>"
   | markdown x y => x.toString ++ "\n" ++ y.toString
   | _ => ""
@@ -118,7 +129,7 @@ def paragraphLine := all.map MdElement.paragraphline |>.trim
 def ulistLine := spacea.map (·.length)
   |>.skip (string "- ") 
   |>.follow all 
-  |>.map (λ (n, s) => MdElement.ulistline n [MdElement.line s])
+  |>.map (λ (n, s) => MdElement.ulistline (MdElement.line s))
 
 def element := heading.or ulistLine 
   |>.or paragraphLine
