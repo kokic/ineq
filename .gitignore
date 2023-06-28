@@ -1,3 +1,5 @@
+
+/.cache
 /build
 /lake-packages/*
 /lean_packages/*

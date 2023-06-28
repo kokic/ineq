@@ -25,6 +25,7 @@ theorem log_ineq_iff (a b : ℝ) (hb : b > 0) : log (a / b) ≤ 0 ↔ b ≥ a :=
 
 -- theorem log_
 
+
 lemma sqrt_self (a : ℝ) : a = a^(1/2) * a^(1/2) := sorry
 lemma sqrt_decompose (a b : ℝ) : (a*b)^(1/2) = a^(1/2) * b^(1/2) := sorry
 
