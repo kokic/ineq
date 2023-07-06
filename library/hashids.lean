@@ -17,8 +17,16 @@ def Hashids.defaultMinimalHashLength := 0
 def Hashids.salt := saltIn
 def Hashids.hashLength := defaultMinimalHashLength
 
-def Hashids.defaultHashids : Hashids := ⟨defaultSalt, defaultMinimalHashLength, defaultAlphabet⟩
-def Hashids.fromSalt (salt : String) : Hashids := ⟨salt, defaultMinimalHashLength, defaultAlphabet⟩
+def Hashids.defaultHashids : Hashids where
+  saltIn := defaultSalt
+  minHashLengthIn := defaultMinimalHashLength
+  alphabetIn := defaultAlphabet
+
+def Hashids.fromSalt (salt : String) : Hashids where 
+  saltIn := salt
+  minHashLengthIn := defaultMinimalHashLength
+  alphabetIn := defaultAlphabet
+
 
 structure AlphabetAndSeparators := 
   (alphabet: String) 
