@@ -7,12 +7,11 @@ package IUTT {
 
 
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git"
-    
+  "https://github.com/leanprover-community/mathlib4.git"    
 
 -- @[ defaultTarget ]
 -- lean_lib «iutt» {
 --   -- add any library configuration options here
 -- }
 
-lean_lib library
+lean_lib ineq

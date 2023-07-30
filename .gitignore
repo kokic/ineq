@@ -5,5 +5,7 @@
 /lean_packages/*
 !/lean_packages/manifest.json
 
+*.js
+
 *clipboard-*
 *-draft*
