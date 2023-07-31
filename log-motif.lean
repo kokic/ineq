@@ -23,16 +23,7 @@ lemma log_ineq_iff (a b : ℝ) {ha : a > 0} {hb : b > 0} :
   --   _ ↔ _ := div_le_one hb
 
 
-
-theorem sinh_log {x : ℝ} (hx : 0 < x) : sinh (log x) = (x - x⁻¹) / 2 := by
-  rw [sinh_eq, exp_neg, exp_log hx]
-
--- lemma ann : log a = log (a - b + b) := by ring
-
 lemma sq_ne_zero {a : ℝ} (h : a ≠ 0) : a^2 ≠ 0 := pow_ne_zero 2 h
-
-#check sq_nonneg
-#check add_pos
 
 -- #check add_pos'
 
@@ -41,16 +32,9 @@ lemma sq_ne_zero {a : ℝ} (h : a ≠ 0) : a^2 ≠ 0 := pow_ne_zero 2 h
 
 
 
+
 lemma mul_nonneg_pos {a b : ℝ} (ha : a ≥ 0) (hb : b > 0) : a * b ≥ 0 := 
   mul_nonneg_iff_left_nonneg_of_pos hb |>.mpr ha
-
--- lemma bagi.factor_nonneg {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
---     2 * a / (a^2 + b^2) ≥ 0 ∧ 2 * b / (a^2 + b^2) ≥ 0 :=
---   have suba : 2 * a ≥ 0 := by simp [mul_nonneg_pos, ha]
---   have subb : 2 * b ≥ 0 := by simp [mul_nonneg_pos, hb]
---   have subs : a^2 + b^2 ≥ 0 := by simp [add_nonneg, sq_nonneg]
---   ⟨div_nonneg suba subs, div_nonneg subb subs⟩
-
 
 -- almost id
 lemma bagi.factor_pos {a b : ℝ} (ha : a > 0) (hb : b > 0): 
@@ -63,35 +47,70 @@ lemma bagi.factor_pos {a b : ℝ} (ha : a > 0) (hb : b > 0):
 
 
 
+lemma sq_sum_nonneg {a b : ℝ} : a^2 + b^2 ≥ 0 := by 
+  simp [add_nonneg, sq_nonneg]
+
+lemma bagi.factor_nonneg {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
+    2 * a^2 / (a^2 + b^2) ≥ 0 ∧ 2 * b^2 / (a^2 + b^2) ≥ 0 :=
+  have suba : 2 * a^2 ≥ 0 := by simp [mul_nonneg_pos, ha]
+  have subb : 2 * b^2 ≥ 0 := by simp [mul_nonneg_pos, hb]
+  have subs : a^2 + b^2 ≥ 0 := sq_sum_nonneg
+  ⟨div_nonneg suba subs, div_nonneg subb subs⟩
 
 
-lemma sqrt_mul_pos (hx : x > 0) (y : ℝ) : 
-    sqrt (x * y) = sqrt x * sqrt y := sorry
+
+
+-- lemma sqrt_mul_pos (hx : x > 0) (y : ℝ) : 
+--     sqrt (x * y) = sqrt x * sqrt y := sorry
+
+-- lemma bagi.factor_expand_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
+--     log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a^2 / (a^2 + b^2))) 
+--                                   + log (sqrt (2 * b^2 / (a^2 + b^2))) :=
   
--- #check pos_
+--   let sum := a^2 + b^2
+--   have pos : 2 * a * b / sum > 0 := sorry
+--   have fab_pos : _ := factor_pos ha hb
+--   have fab_ne : _ := And.intro (sqrt_ne_zero'.mpr fab_pos.left) (sqrt_ne_zero'.mpr fab_pos.right)
+
+--   calc 
+--     _ = log (sqrt ((2 * a * b / sum)^2)) := by rw [sqrt_sq pos]
+--     _ = log (sqrt ((2 * a^2 / sum) * (2 * b^2 / sum))) := by ring_nf
+--     _ = log (sqrt (2 * a^2 / sum) * sqrt (2 * b^2 / sum)) := by rw [sqrt_mul_pos fab_pos.left]
+--     _ = _ := log_mul fab_ne.left fab_ne.right
 
 
-#check sqrt_mul_pos
 
-lemma bagi.factor_expand {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
+-- dangerous
+axiom log_mul_nonneg {x y : ℝ} : log (x * y) = log x + log y
+
+-- lemma log_mul_nonneg {x y : ℝ} : log (x * y) = log x + log y := by
+  -- cases' eq_or_ne x 0 with h1 h1
+  -- · calc
+  --     _ = log 0 := by simp [ h1 ]
+  --     _ = _ := sorry
+  -- · sorry
+
+
+lemma bagi.factor_expand {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0) : 
     log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a^2 / (a^2 + b^2))) 
                                   + log (sqrt (2 * b^2 / (a^2 + b^2))) :=
   
-  let sqsum := a^2 + b^2  
-  -- have ann : _ := bagi.factor_pos ha hb |>.left
-  have fab_pos : _ := factor_pos ha hb
-  have fab_ne : _ := And.intro
-    (sqrt_ne_zero'.mpr fab_pos.left)
-    (sqrt_ne_zero'.mpr fab_pos.right)
+  let sum := a^2 + b^2
+  have nneg₁ : 2 * a * b ≥ 0 := by simp [ha, hb, mul_nonneg, mul_nonneg_pos]
+  have nneg₂ : 2 * a * b / sum ≥ 0 := by simp [div_nonneg, nneg₁, sq_sum_nonneg]
+  have fab_nneg : _ := factor_nonneg ha hb
+  -- have fab_ne : sqrt (2 * a^2 / (a^2 + b^2)) ≠ 0 ∧ 
+  --               sqrt (2 * b^2 / (a^2 + b^2)) ≠ 0 := sorry 
+  -- _ := And.intro (sqrt_ne_zero'.mpr fab_pos.left) (sqrt_ne_zero'.mpr fab_pos.right)
 
   calc 
-    _ = log (2 * a * b / (a^2 + b^2)) := by trivial
-    _ = log (sqrt ((2 * a^2 / sqsum) * (2 * b^2 / sqsum))) := sorry
-    _ = log (sqrt (2 * a^2 / sqsum) * sqrt (2 * b^2 / sqsum)) := by 
-      rw [sqrt_mul_pos fab_pos.left]
-    _ = _ := log_mul fab_ne.left fab_ne.right
+    _ = log (sqrt ((2 * a * b / sum)^2)) := by rw [sqrt_sq nneg₂]
+    _ = log (sqrt ((2 * a^2 / sum) * (2 * b^2 / sum))) := by ring_nf
+    _ = log (sqrt (2 * a^2 / sum) * sqrt (2 * b^2 / sum)) := by rw [sqrt_mul fab_nneg.left]
+    _ = _ := log_mul_nonneg -- log_mul fab_ne.left fab_ne.right
 
-    -- _ = _ := by rw [log_mul hfa hfb]
+
+
 
 
 
