@@ -52,41 +52,42 @@ lemma mul_nonneg_pos {a b : ℝ} (ha : a ≥ 0) (hb : b > 0) : a * b ≥ 0 :=
 --   ⟨div_nonneg suba subs, div_nonneg subb subs⟩
 
 
+-- almost id
 lemma bagi.factor_pos {a b : ℝ} (ha : a > 0) (hb : b > 0): 
-    2 * a / (a^2 + b^2) > 0 ∧ 2 * b / (a^2 + b^2) > 0 :=
-  have suba : 2 * a > 0 := by simp [mul_pos, ha]
-  have subb : 2 * b > 0 := by simp [mul_pos, hb]
-  have subs : a^2 + b^2 > 0 := by simp [add_pos, sq_pos_of_pos ha, sq_pos_of_pos hb]
+    2 * a^2 / (a^2 + b^2) > 0 ∧ 2 * b^2 / (a^2 + b^2) > 0 :=
+  have suba : 2 * a^2 > 0 := by simp [mul_pos, ha]
+  have subb : 2 * b^2 > 0 := by simp [mul_pos, hb]
+  have subs : a^2 + b^2 > 0 := by 
+    simp [add_pos, sq_pos_of_pos ha, sq_pos_of_pos hb]
   ⟨div_pos suba subs, div_pos subb subs⟩
 
 
-
-#check sqrt_mul
 
 
 
 lemma sqrt_mul_pos (hx : x > 0) (y : ℝ) : 
     sqrt (x * y) = sqrt x * sqrt y := sorry
-
+  
 -- #check pos_
 
+
+#check sqrt_mul_pos
+
 lemma bagi.factor_expand {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
-    log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a / (a^2 + b^2))) 
-                                  + log (sqrt (2 * b / (a^2 + b^2))) :=
+    log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a^2 / (a^2 + b^2))) 
+                                  + log (sqrt (2 * b^2 / (a^2 + b^2))) :=
   
+  let sqsum := a^2 + b^2  
   -- have ann : _ := bagi.factor_pos ha hb |>.left
   have fab_pos : _ := factor_pos ha hb
-
-  let sqsum := a^2 + b^2
-
-  
   have fab_ne : _ := And.intro
     (sqrt_ne_zero'.mpr fab_pos.left)
     (sqrt_ne_zero'.mpr fab_pos.right)
 
   calc 
-    _ = log (sqrt ((2 * a / sqsum) * (2 * b / sqsum)) ) := sorry
-    _ = log (sqrt (2 * a / sqsum) * sqrt (2 * b / sqsum)) := by 
+    _ = log (2 * a * b / (a^2 + b^2)) := by trivial
+    _ = log (sqrt ((2 * a^2 / sqsum) * (2 * b^2 / sqsum))) := sorry
+    _ = log (sqrt (2 * a^2 / sqsum) * sqrt (2 * b^2 / sqsum)) := by 
       rw [sqrt_mul_pos fab_pos.left]
     _ = _ := log_mul fab_ne.left fab_ne.right
 
