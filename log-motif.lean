@@ -7,7 +7,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 open Real
 
-lemma log_ineq_iff (a b : ℝ) {ha : a > 0} {hb : b > 0} : 
+lemma log_ineq_iff {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
     log (a / b) ≤ 0 ↔ a ≤ b := by 
   rw [log_nonpos_iff (div_pos ha hb), div_le_one hb] 
   -- simp [log_nonpos_iff, div_pos ha hb, div_le_one hb] 
@@ -34,7 +34,6 @@ lemma sq_sum_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) :
     a^2 + b^2 > 0 := by simp [add_pos, sq_pos_of_pos ha, sq_pos_of_pos hb]
 
 
-#check zero_lt_iff
 -- #check pos_iff_ne_zero
 
 -- lemma sq_ne_zero {a : ℝ} (h : a ≠ 0) : a^2 ≠ 0 := pow_ne_zero 2 h
@@ -44,6 +43,13 @@ lemma sq_sum_ne_zero {a b : ℝ} (ha : a > 0) (hb : b > 0) :
 
 
 -- by simp [pos_iff_ne_zero, sq_sum_pos ha hb]
+
+#check zero_lt_iff
+#check pos_iff_ne_zero
+
+#check AddMonoid
+
+#check NNReal
 
 
 -- almost id
@@ -79,7 +85,7 @@ lemma bagi.factor_expand_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) :
 
 
 
-lemma bagi.log_elim_pos {a b : ℝ} (ha : a > 0) (hb : b > 0): 
+lemma bagi.log_elim_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
     log (sqrt (2 * a^2 / (a^2 + b^2))) ≤ a^2 / (a^2 + b^2) - 1/2 ∧ 
     log (sqrt (2 * b^2 / (a^2 + b^2))) ≤ b^2 / (a^2 + b^2) - 1/2 :=
   let ⟨pos₁, pos₂⟩ := factor_pos ha hb; by
@@ -101,11 +107,40 @@ lemma bagi.log_elim_pos {a b : ℝ} (ha : a > 0) (hb : b > 0):
 
 
 
-lemma bagi.frac_elim {a b : ℝ} (ha : a > 0) (hb : b > 0): 
+lemma bagi.frac_elim {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
     a^2 / (a^2 + b^2) - 1/2 + b^2 / (a^2 + b^2) - 1/2 = 0 := by  
   calc 
     _ = (a^2 + b^2) / (a^2 + b^2) - 1 := by ring
     _ = 0 := by simp [div_self, sq_sum_ne_zero ha hb]
+
+
+
+-- remark. 
+
+lemma bagi.elim {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
+    log (2 * a * b / (a^2 + b^2)) ≤ 0 := by 
+  have ⟨ineq₁, ineq₂⟩ := log_elim_pos ha hb
+  calc
+    _ = _ := factor_expand_pos ha hb
+    _ ≤ _ := add_le_add ineq₁ ineq₂
+    _ = _ := by rw [add_sub_assoc', frac_elim ha hb]
+  
+
+theorem sq_sum_ge_mul (a b : ℝ) (ha : a > 0) (hb : b > 0) : 
+    a^2 + b^2 ≥ 2 * a * b :=
+  let pos₁ := mul_pos (mul_pos two_pos ha) hb
+  let pos₂ := sq_sum_pos ha hb
+  log_ineq_iff pos₁ pos₂ |>.mp (bagi.elim ha hb)
+
+
+
+
+
+
+
+
+
+
 
 
 
