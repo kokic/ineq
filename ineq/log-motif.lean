@@ -30,16 +30,41 @@ lemma pos_to_nonneg {x : ℝ} (h : x > 0) : x ≥ 0 := le_iff_lt_or_eq.mpr (Or.i
 -- bagi i.e. binary arith mean - geo mean ineq
 
 
+#check pow_pos
+
+lemma pow_sum_pos {a b : ℝ} {n : ℕ} (ha : a > 0) (hb : b > 0) : 
+    a^n + b^n > 0 := by simp [add_pos, pow_pos, ha, hb]
+
+lemma pow_sum_ne_zero {a b : ℝ} {n : ℕ} (ha : a > 0) (hb : b > 0) : 
+    a^n + b^n ≠ 0 := ne_of_gt (pow_sum_pos ha hb)
+
+lemma pow_factor_pos {a b : ℝ} {n : ℕ} (ha : a > 0) (hb : b > 0) : 
+    2 * a^n / (a^n + b^n) > 0 ∧ 2 * b^n / (a^n + b^n) > 0 :=
+  have suba : 2 * a^n > 0 := by simp [mul_pos, ha]
+  have subb : 2 * b^n > 0 := by simp [mul_pos, hb]
+  have subs : a^n + b^n > 0 := pow_sum_pos ha hb
+  ⟨div_pos suba subs, div_pos subb subs⟩
+
+
+
+
+
+
+-- n = 2
+
 lemma sq_sum_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
-    a^2 + b^2 > 0 := by simp [add_pos, sq_pos_of_pos ha, sq_pos_of_pos hb]
+    a^2 + b^2 > 0 := pow_sum_pos ha hb
+--by simp [add_pos, sq_pos_of_pos ha, sq_pos_of_pos hb]
+
+lemma sq_sum_ne_zero {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
+    a^2 + b^2 ≠ 0 := pow_sum_ne_zero ha hb
+-- ne_of_gt (sq_sum_pos ha hb)
+
 
 
 -- #check pos_iff_ne_zero
 
 -- lemma sq_ne_zero {a : ℝ} (h : a ≠ 0) : a^2 ≠ 0 := pow_ne_zero 2 h
-
-lemma sq_sum_ne_zero {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
-    a^2 + b^2 ≠ 0 := ne_of_gt (sq_sum_pos ha hb)
 
 
 -- by simp [pos_iff_ne_zero, sq_sum_pos ha hb]
@@ -55,10 +80,11 @@ lemma sq_sum_ne_zero {a b : ℝ} (ha : a > 0) (hb : b > 0) :
 -- almost id
 lemma bagi.factor_pos {a b : ℝ} (ha : a > 0) (hb : b > 0) : 
     2 * a^2 / (a^2 + b^2) > 0 ∧ 2 * b^2 / (a^2 + b^2) > 0 :=
-  have suba : 2 * a^2 > 0 := by simp [mul_pos, ha]
-  have subb : 2 * b^2 > 0 := by simp [mul_pos, hb]
-  have subs : a^2 + b^2 > 0 := sq_sum_pos ha hb
-  ⟨div_pos suba subs, div_pos subb subs⟩
+  pow_factor_pos ha hb
+  -- have suba : 2 * a^2 > 0 := by simp [mul_pos, ha]
+  -- have subb : 2 * b^2 > 0 := by simp [mul_pos, hb]
+  -- have subs : a^2 + b^2 > 0 := sq_sum_pos ha hb
+  -- ⟨div_pos suba subs, div_pos subb subs⟩
 
 
 
@@ -164,18 +190,18 @@ theorem sq_sum_ge_mul (a b : ℝ) (ha : a > 0) (hb : b > 0) :
 
 
 -- nonneg
-lemma mul_nonneg_pos {a b : ℝ} (ha : a ≥ 0) (hb : b > 0) : a * b ≥ 0 := 
-  mul_nonneg_iff_left_nonneg_of_pos hb |>.mpr ha
+-- lemma mul_nonneg_pos {a b : ℝ} (ha : a ≥ 0) (hb : b > 0) : a * b ≥ 0 := 
+--   mul_nonneg_iff_left_nonneg_of_pos hb |>.mpr ha
 
-lemma sq_sum_nonneg {a b : ℝ} : a^2 + b^2 ≥ 0 := by 
-  simp [add_nonneg, sq_nonneg]
+-- lemma sq_sum_nonneg {a b : ℝ} : a^2 + b^2 ≥ 0 := by 
+--   simp [add_nonneg, sq_nonneg]
 
-lemma bagi.factor_nonneg {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
-    2 * a^2 / (a^2 + b^2) ≥ 0 ∧ 2 * b^2 / (a^2 + b^2) ≥ 0 :=
-  have suba : 2 * a^2 ≥ 0 := by simp [mul_nonneg_pos, ha]
-  have subb : 2 * b^2 ≥ 0 := by simp [mul_nonneg_pos, hb]
-  have subs : a^2 + b^2 ≥ 0 := sq_sum_nonneg
-  ⟨div_nonneg suba subs, div_nonneg subb subs⟩
+-- lemma bagi.factor_nonneg {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
+--     2 * a^2 / (a^2 + b^2) ≥ 0 ∧ 2 * b^2 / (a^2 + b^2) ≥ 0 :=
+--   have suba : 2 * a^2 ≥ 0 := by simp [mul_nonneg_pos, ha]
+--   have subb : 2 * b^2 ≥ 0 := by simp [mul_nonneg_pos, hb]
+--   have subs : a^2 + b^2 ≥ 0 := sq_sum_nonneg
+--   ⟨div_nonneg suba subs, div_nonneg subb subs⟩
 
 
 
@@ -202,18 +228,19 @@ lemma bagi.factor_nonneg {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0):
 
 
 
-lemma bagi.factor_expand {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0) : 
-    log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a^2 / (a^2 + b^2))) 
-                                  + log (sqrt (2 * b^2 / (a^2 + b^2))) :=
-  let sum := a^2 + b^2
-  have nneg₁ : 2 * a * b ≥ 0 := by simp [ha, hb, mul_nonneg, mul_nonneg_pos]
-  have nneg₂ : 2 * a * b / sum ≥ 0 := by simp [div_nonneg, nneg₁, sq_sum_nonneg]
-  have fab_nneg : _ := factor_nonneg ha hb
-  calc 
-    _ = log (sqrt ((2 * a * b / sum)^2)) := by rw [sqrt_sq nneg₂]
-    _ = log (sqrt ((2 * a^2 / sum) * (2 * b^2 / sum))) := by ring_nf
-    _ = log (sqrt (2 * a^2 / sum) * sqrt (2 * b^2 / sum)) := by rw [sqrt_mul fab_nneg.left]
-    _ = _ := log_mul_axiom
+-- lemma bagi.factor_expand {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0) : 
+--     log (2 * a * b / (a^2 + b^2)) = log (sqrt (2 * a^2 / (a^2 + b^2))) 
+--                                   + log (sqrt (2 * b^2 / (a^2 + b^2))) :=
+--   let sum := a^2 + b^2
+--   have nneg₁ : 2 * a * b ≥ 0 := by simp [ha, hb, mul_nonneg, mul_nonneg_pos]
+--   have nneg₂ : 2 * a * b / sum ≥ 0 := by simp [div_nonneg, nneg₁, sq_sum_nonneg]
+--   have fab_nneg : _ := factor_nonneg ha hb
+--   calc 
+--     _ = log (sqrt ((2 * a * b / sum)^2)) := by rw [sqrt_sq nneg₂]
+--     _ = log (sqrt ((2 * a^2 / sum) * (2 * b^2 / sum))) := by ring_nf
+--     _ = log (sqrt (2 * a^2 / sum) * sqrt (2 * b^2 / sum)) := by rw [sqrt_mul fab_nneg.left]
+--     _ = _ := log_mul_axiom
+
 
 -- have fab_ne : sqrt (2 * a^2 / (a^2 + b^2)) ≠ 0 ∧ 
 --               sqrt (2 * b^2 / (a^2 + b^2)) ≠ 0 := sorry 
@@ -222,29 +249,25 @@ lemma bagi.factor_expand {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0) :
 
 
 
-
-
-
-
-lemma bagi.log_elim {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
-    log (sqrt (2 * a^2 / (a^2 + b^2))) ≤ a^2 / (a^2 + b^2) - 1/2 ∧ 
-    log (sqrt (2 * b^2 / (a^2 + b^2))) ≤ b^2 / (a^2 + b^2) - 1/2 :=
-  let ⟨nneg₁, nneg₂⟩ := factor_nonneg ha hb; by
-  apply And.intro
-  case left => 
-    have elim₁ : log (2 * a^2 / (a^2 + b^2)) ≤ _ := log_le_sub_one
-    have elim₂ : _ := div_le_div_of_le zero_le_two elim₁
-    calc
-      _ = _ := log_sqrt nneg₁
-      _ ≤ _ := elim₂
-      _ = _ := by ring
-  case right => 
-    have elim₁ : log (2 * b^2 / (a^2 + b^2)) ≤ _ := log_le_sub_one
-    have elim₂ : _ := div_le_div_of_le zero_le_two elim₁
-    calc
-      _ = _ := log_sqrt nneg₂
-      _ ≤ _ := elim₂
-      _ = _ := by ring
+-- lemma bagi.log_elim {a b : ℝ} (ha : a ≥ 0) (hb : b ≥ 0): 
+--     log (sqrt (2 * a^2 / (a^2 + b^2))) ≤ a^2 / (a^2 + b^2) - 1/2 ∧ 
+--     log (sqrt (2 * b^2 / (a^2 + b^2))) ≤ b^2 / (a^2 + b^2) - 1/2 :=
+--   let ⟨nneg₁, nneg₂⟩ := factor_nonneg ha hb; by
+--   apply And.intro
+--   case left => 
+--     have elim₁ : log (2 * a^2 / (a^2 + b^2)) ≤ _ := log_le_sub_one
+--     have elim₂ : _ := div_le_div_of_le zero_le_two elim₁
+--     calc
+--       _ = _ := log_sqrt nneg₁
+--       _ ≤ _ := elim₂
+--       _ = _ := by ring
+--   case right => 
+--     have elim₁ : log (2 * b^2 / (a^2 + b^2)) ≤ _ := log_le_sub_one
+--     have elim₂ : _ := div_le_div_of_le zero_le_two elim₁
+--     calc
+--       _ = _ := log_sqrt nneg₂
+--       _ ≤ _ := elim₂
+--       _ = _ := by ring
 
 
 
