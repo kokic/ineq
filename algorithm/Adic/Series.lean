@@ -40,7 +40,9 @@ def toNat (series : AdicNumberSeries) :=
 
 -- √n i.e. x s.t. x² = a
 
-def findPowerSolution (a adic power : Nat) :=
+
+-- none or x₀ s.t. xᵖ = a
+def hasPowerSolution (a adic power : Nat) :=
   let rec aux : Nat → Option Nat 
     | 0 => none
     | dec + 1 => 
@@ -49,8 +51,36 @@ def findPowerSolution (a adic power : Nat) :=
       then some x else aux dec
   aux adic
 
--- #eval findPowerSolution 2 7 2
--- #eval findPowerSolution 4 5 2
+
+
+-- #eval hasPowerSolution 2 7 2
+-- #eval hasPowerSolution 4 5 3
+
+
+def rootByEnum (a adic order n : Nat) := 
+  let power_go (acc power : Nat) := 
+    let rec aux : Nat → Option Nat
+      | 0 => none -- no solution
+      | dec + 1 =>
+        let coeff := adic - dec
+        let approx := acc + coeff * adic ^ power
+        if approx ^ order % adic ^ (power + 1) == a 
+        then some coeff else aux dec
+    aux adic
+  let rec coeff_go
+    | 0 => []
+    | n + 1 => 
+      let xs := coeff_go n
+      let acc := toNat' adic xs
+      match power_go acc n with 
+        | none => xs
+        | some x => xs ++ [x]
+  coeff_go n
+
+-- #eval rootByEnum 2 7 2 5
+-- #eval rootByEnum 5 7 2 5
+-- #eval rootByEnum 4 5 3 5
+
 
 --| a, adic, 1 => [power_go a adic 0 0]
 def sqrtByEnum : Nat → Nat → Nat → List Nat
