@@ -1,7 +1,5 @@
 
 
--- p-adic of a nat
-
 structure AdicNumberSeries :=
   adic : Nat
   data : List Nat
@@ -38,11 +36,21 @@ def toNat (series : AdicNumberSeries) :=
 -- #eval toNat (fromNat 5 7)
 
 
-
+-- #check List.range
 
 -- √n i.e. x s.t. x² = a
 
--- def hasSolution
+def findPowerSolution (a adic power : Nat) :=
+  let rec aux : Nat → Option Nat 
+    | 0 => none
+    | dec + 1 => 
+      let x := adic - dec
+      if x ^ power % adic == a
+      then some x else aux dec
+  aux adic
+
+-- #eval findPowerSolution 2 7 2
+-- #eval findPowerSolution 4 5 2
 
 --| a, adic, 1 => [power_go a adic 0 0]
 def sqrtByEnum : Nat → Nat → Nat → List Nat
@@ -59,7 +67,7 @@ def sqrtByEnum : Nat → Nat → Nat → List Nat
           let coeff := adic - dec
           let approx := acc + coeff * adic ^ power
           if approx ^ 2 % adic ^ (power + 1) == a 
-        then coeff else aux dec
+          then coeff else aux dec
       aux adic
 
 -- #eval sqrt 5 11 3
