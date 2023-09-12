@@ -83,22 +83,23 @@ def rootByEnum (a adic order n : Nat) :=
 
 
 --| a, adic, 1 => [power_go a adic 0 0]
-def sqrtByEnum : Nat → Nat → Nat → List Nat
-  | _, _, 0 => []
-  | a, adic, n + 1 => 
-    let xs := sqrtByEnum a adic n
-    let acc := AdicNumberSeries.toNat' adic xs
-    xs ++ [power_go a adic acc n]
-  where 
-    power_go (a adic acc power : Nat) := 
-      let rec aux : Nat → Nat
-        | 0 => 0 -- no solution
-        | dec + 1 =>
-          let coeff := adic - dec
-          let approx := acc + coeff * adic ^ power
-          if approx ^ 2 % adic ^ (power + 1) == a 
-          then coeff else aux dec
-      aux adic
+-- def sqrtByEnum : Nat → Nat → Nat → List Nat
+--   | _, _, 0 => []
+--   | a, adic, n + 1 => 
+--     let xs := sqrtByEnum a adic n
+--     let acc := AdicNumberSeries.toNat' adic xs
+--     xs ++ [power_go a adic acc n]
+--   where 
+--     power_go (a adic acc power : Nat) := 
+--       let rec aux : Nat → Nat
+--         | 0 => 0 -- no solution
+--         | dec + 1 =>
+--           let coeff := adic - dec
+--           let approx := acc + coeff * adic ^ power
+--           if approx ^ 2 % adic ^ (power + 1) == a 
+--           then coeff else aux dec
+--       aux adic
+
 
 -- #eval sqrt 5 11 3
 
