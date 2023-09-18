@@ -4,7 +4,7 @@ structure Mat2x2 (α : Type u) :=
   a₁₁ : α 
   a₁₂ : α 
   a₂₁ : α 
-  a₂₂ : α
+  a₂₂ : α 
 deriving Repr 
 
 
@@ -64,7 +64,7 @@ def coeffByEuclid (numerator denominator : Nat) :=
   coeffByEuclidAux numerator denominator []
 
   
-def coeffByLimitedEuclid (numerator denominator n : Nat) 
+def coeffByEuclidFinite (numerator denominator n : Nat) 
     := Id.run do
   let mut xs : List Nat := []
   let mut (p, q) := (numerator, denominator)
@@ -84,8 +84,8 @@ end ContinuedFrac
 -- #eval coeffByEuclid 43 19
 -- #eval coeffByEuclid 19 43
 
--- #eval coeffByLimitedEuclid 43 19 5
--- #eval coeffByLimitedEuclid 19 43 5
+-- #eval coeffByEuclidFinite 43 19 5
+-- #eval coeffByEuclidFinite 19 43 5
 
 
 
