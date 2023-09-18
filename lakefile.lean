@@ -1,10 +1,9 @@
 import Lake
 open Lake DSL
 
-package IUTT {
+package IUT {
   -- add any package configuration options here
 }
-
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"    
@@ -14,4 +13,12 @@ require mathlib from git
 --   -- add any library configuration options here
 -- }
 
-lean_lib ineq
+-- lean_lib ineq
+
+lean_lib «algorithm»
+
+-- lean_lib algorithm where
+--   roots := #[ `algorithm ]
+
+-- lean_lib IUT where 
+--   roots := #[ `IUT ]

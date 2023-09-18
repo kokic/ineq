@@ -44,6 +44,51 @@ def A := Mat2x2.mk 1 2 3 4
 #eval A.mul A
 
 
+
+
+
+namespace ContinuedFrac
+
+
+
+
+
+partial def coeffByEuclidAux (p q : Nat) (xs : List Nat) :=
+  if p < q then coeffByEuclidAux q p (0 :: xs) else
+  match p % q with
+    | 0 => xs ++ [p]
+    | r => let a := (p - r) / q
+           coeffByEuclidAux q r (xs ++ [a])
+
+def coeffByEuclid (numerator denominator : Nat) := 
+  coeffByEuclidAux numerator denominator []
+
+  
+def coeffByLimitedEuclid (numerator denominator n : Nat) 
+    := Id.run do
+  let mut xs : List Nat := []
+  let mut (p, q) := (numerator, denominator)
+  for _ in [:n] do
+    if p < q then (p, q) := (q, p); xs := 0 :: xs else
+    match p % q with
+      | 0 => return xs ++ [p]
+      | r => let a := (p - r) / q
+             (xs, p, q) := (xs ++ [a], q, r)
+  xs
+
+
+
+end ContinuedFrac
+
+
+-- #eval coeffByEuclid 43 19
+-- #eval coeffByEuclid 19 43
+
+-- #eval coeffByLimitedEuclid 43 19 5
+-- #eval coeffByLimitedEuclid 19 43 5
+
+
+
 -- #check (Mat2x2 Nat).mul⟩
 
 -- def regularContinuedFrac
