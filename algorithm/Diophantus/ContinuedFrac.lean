@@ -14,7 +14,7 @@ deriving Repr
 
 class AddMul (α : Type u) where
   add : α → α → α
-  mul : α → α → α 
+  mul : α → α → α
 -- export RingOperator (add mul)
 
 
@@ -29,6 +29,21 @@ def Mat2x2.mul [AddMul α] : Mat2x2 α → Mat2x2 α → Mat2x2 α :=
     (add (mul A.a₂₁ B.a₁₁) (mul A.a₂₂ B.a₂₁))
     (add (mul A.a₂₁ B.a₁₂) (mul A.a₂₂ B.a₂₂))
 
+
+instance [AddMul α] : Mul (Mat2x2 α) := ⟨.mul⟩
+
+
+def Mat2x2.power [AddMul α] : Mat2x2 α → α → α → Nat → Mat2x2 α
+  | _, zero, one, 0 => Mat2x2.mk one zero zero one
+  | A, _, _, 1 => A
+  | A, _, _, 2 => A * A
+  | A, zero, one, n + 1 => A.mul (A.power zero one n)
+
+
+def Mat2x2.powerNat : Mat2x2 Nat → Nat → Mat2x2 Nat
+  | A, n => power A 0 1 n
+
+
 -- def ConcreteMat.mul (A B : Mat2x2 α) := 
 
 
@@ -39,10 +54,12 @@ def Mat2x2.mul [AddMul α] : Mat2x2 α → Mat2x2 α → Mat2x2 α :=
 
 
 
-def A := Mat2x2.mk 1 2 3 4
+-- def A := Mat2x2.mk 1 2 3 4
+-- #eval A.mul A
 
-#eval A.mul A
 
+def fracMat (p q : Nat) := Mat2x2.mk 0 1 p q
+def fracMatReg (a : Nat) := Mat2x2.mk 0 1 1 a
 
 
 
@@ -76,12 +93,32 @@ def coeffByEuclidFinite (numerator denominator n : Nat)
              (xs, p, q) := (xs ++ [a], q, r)
   xs
 
-
-
 end ContinuedFrac
 
 
--- #eval coeffByEuclid 43 19
+
+def UInt32.ε := 1 / UInt32.size.toFloat
+
+def floatApproxUInt32 (value : Float) (n : Nat) := Id.run do
+  let mut xs : List Nat := []
+  let mut approx := value
+  for _ in [:n] do
+    let cᵢ := approx.floor
+    xs := xs ++ [cᵢ.toUInt32.toNat]
+    let diff := approx - cᵢ
+    if diff < UInt32.ε then return xs
+    approx := 1 / diff
+  xs
+
+open ContinuedFrac
+
+
+-- #eval coeffByEuclid 111 19
+-- #eval floatApproxUInt32 (111 / 19) 5
+
+
+-- #eval (1./0).floor
+
 -- #eval coeffByEuclid 19 43
 
 -- #eval coeffByEuclidFinite 43 19 5

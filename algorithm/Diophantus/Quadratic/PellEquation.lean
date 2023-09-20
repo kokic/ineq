@@ -1,5 +1,5 @@
 
--- import algorithm.Diophantus.ContinuedFrac
+import Algorithm.Diophantus.ContinuedFrac
 
 -- #check ContinuedFrac
 
@@ -7,9 +7,6 @@
 
 namespace PellEquation
 
-
--- def aux (x : Float) :=
-  -- 1 / (x - x.floor)
 
 def quadraticContinuedFracFinite (d n : Nat) := Id.run do
   let mut xs : List Nat := []
@@ -22,12 +19,65 @@ def quadraticContinuedFracFinite (d n : Nat) := Id.run do
 
 
 
--- #check coeffByEuclidAux
--- #eval quadraticContinuedFracFinite 7 10
 
 
 
--- #eval 
--- #eval (1 / (sq5 - sq5.floor)).floor
+structure PellPair :=
+  p : Int
+  q : Int
+deriving Repr
+
+def PellPair.addInt (pair : PellPair) (a : Int) :=
+  PellPair.mk (pair.p + pair.q * a) pair.q
+
+end PellEquation
+
+def Mat2x2.toPair (A : Mat2x2 Nat) := PellEquation.PellPair.mk A.a₁₂ A.a₂₂
+
+
+namespace Solution
+
+
+instance [AddMul α] : Mul (Mat2x2 α) := ⟨.mul⟩
+
+-- #check Mat2x2.mul
+-- #check Mat2x2.powerNat
+
+
+-- x² - 5y² = 1
+-- #eval quadraticContinuedFracFinite 5 4
+-- [2, 4, 4, 4]
+
+def five (nth : Nat) := 
+  let A := fracMatReg 4
+  let B := A.powerNat 2 -- fracMatReg 4 |>.mul A
+  A.mul (B.powerNat nth) |>.toPair |>.addInt 2
+
+-- #eval five 0
+-- #eval 9^2 - 4^2*5
+
+-- #eval five 1
+-- #eval 161^2 - 72^2*5
+
+
+
+
+-- x² - 7y² = 1
+-- #eval quadraticContinuedFracFinite 7 9
+-- [2, 1, 1, 1, 4, 1, 1, 1, 4]
+
+def seven (nth : Nat) := 
+  let A := fracMatReg 1 |>.powerNat 3
+  let B := fracMatReg 4 |>.mul A
+  A.mul (B.powerNat nth) |>.toPair |>.addInt 2
+
+-- #eval seven 0
+-- #eval 8^2 - 3^2 * 7
+
+-- #eval seven 1
+-- #eval 127^2 - 48^2 * 7
+
+
+
 
 
