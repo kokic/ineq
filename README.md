@@ -1,5 +1,5 @@
 # ineq
-proof samples in [lean4](https://github.com/leanprover/lean4).
+algorithm & proof samples in [lean4](https://github.com/leanprover/lean4).
 
 ## req
 
