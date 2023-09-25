@@ -15,8 +15,6 @@ require mathlib from git
 
 -- lean_lib ineq
 
-lean_lib «algorithm»
-
 -- lean_lib algorithm where
 --   roots := #[ `algorithm ]
 
